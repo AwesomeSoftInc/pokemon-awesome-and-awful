@@ -6038,4 +6038,8 @@ export const FormatsData: {[k: string]: SpeciesFormatsData} = {
 		isNonstandard: "Custom",
 		tier: "Illegal",
 	},
+	killpain: {
+		isNonstandard: "CAP",
+		tier:"CAP",
+	}
 };
