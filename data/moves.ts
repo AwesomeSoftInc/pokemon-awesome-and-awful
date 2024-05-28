@@ -3783,7 +3783,7 @@ export const Moves: {[moveid: string]: MoveData} = {
 					}
 				}
 				if (effect.effectType === 'Ability') {
-					this.add('-start', pokemon, 'Disable', pokemon.lastMove.name, '[from] ability: Cursed Body', '[of] ' + source);
+					this.add('-start', pokemon, 'Disable', pokemon.lastMove.name, '[from] ability: ' + effect.name, '[of] ' + source);
 				} else {
 					this.add('-start', pokemon, 'Disable', pokemon.lastMove.name);
 				}
@@ -5723,7 +5723,7 @@ export const Moves: {[moveid: string]: MoveData} = {
 		num: 175,
 		accuracy: 100,
 		basePower: 0,
-		basePowerCallback(pokemon, target) {
+		basePowerCallback(pokemon) {
 			const ratio = Math.max(Math.floor(pokemon.hp * 48 / pokemon.maxhp), 1);
 			let bp;
 			if (ratio < 2) {
@@ -8604,7 +8604,9 @@ export const Moves: {[moveid: string]: MoveData} = {
 				if ((effect?.id === 'zpower') || this.effectState.isZ) return damage;
 				return false;
 			},
-			onRestart(target, source) {
+			onRestart(target, source, effect) {
+				if (effect?.name === 'Psychic Noise') return;
+
 				this.add('-fail', target, 'move: Heal Block'); // Succeeds to supress downstream messages
 				if (!source.moveThisTurnResult) {
 					source.moveThisTurnResult = false;
@@ -15618,7 +15620,7 @@ export const Moves: {[moveid: string]: MoveData} = {
 		num: 179,
 		accuracy: 100,
 		basePower: 0,
-		basePowerCallback(pokemon, target) {
+		basePowerCallback(pokemon) {
 			const ratio = Math.max(Math.floor(pokemon.hp * 48 / pokemon.maxhp), 1);
 			let bp;
 			if (ratio < 2) {
@@ -17245,6 +17247,7 @@ export const Moves: {[moveid: string]: MoveData} = {
 			target.ability = sourceAbility.id;
 			source.abilityState = {id: this.toID(source.ability), target: source};
 			target.abilityState = {id: this.toID(target.ability), target: target};
+			source.volatileStaleness = undefined;
 			if (!target.isAlly(source)) target.volatileStaleness = 'external';
 			this.singleEvent('Start', targetAbility, source.abilityState, source);
 			this.singleEvent('Start', sourceAbility, target.abilityState, target);
@@ -19501,9 +19504,14 @@ export const Moves: {[moveid: string]: MoveData} = {
 			onStart(pokemon) {
 				this.add('-start', pokemon, 'Syrup Bomb');
 			},
+			onUpdate(pokemon) {
+				if (this.effectState.source && !this.effectState.source.isActive) {
+					pokemon.removeVolatile('syrupbomb');
+				}
+			},
 			onResidualOrder: 14,
-			onResidual() {
-				this.boost({spe: -1});
+			onResidual(pokemon) {
+				this.boost({spe: -1}, pokemon, this.effectState.source);
 			},
 			onEnd(pokemon) {
 				this.add('-end', pokemon, 'Syrup Bomb', '[silent]');
