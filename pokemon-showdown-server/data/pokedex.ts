@@ -19746,7 +19746,7 @@ export const Pokedex: {[speciesid: string]: SpeciesData} = {
 		eggGroups: ["Undiscovered"],
 		gen: 5,
 	},
-	killpain: {
+	generalkillpain: {
         num: -666,
         name: "General Kill Pain",
         types: ["Dark", "Fighting"],
